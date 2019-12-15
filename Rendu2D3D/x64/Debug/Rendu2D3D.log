@@ -1,0 +1,4 @@
+﻿  Rendu2D3D.cpp
+c:\users\régis\desktop\esgi\4eme annee\opengl\solution opengl vs2015\opengl-4a\rendu2d3d\rendu2d3d.cpp(140): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+c:\users\régis\desktop\esgi\4eme annee\opengl\solution opengl vs2015\opengl-4a\rendu2d3d\rendu2d3d.cpp(143): warning C4244: 'argument' : conversion de 'double' en 'float', perte possible de données
+  Rendu2D3D.vcxproj -> C:\Users\Régis\Desktop\ESGI\4eme annee\OpenGL\Solution OpenGL VS2015\OpenGL-4A\x64\Debug\Rendu2D3D.exe
