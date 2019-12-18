@@ -42,7 +42,7 @@ GLuint VAO;
 
 struct Vertex 
 {
-	float x, y;
+	float x, y, z;
 	float r, g, b;
 };
 
@@ -67,13 +67,14 @@ void Initialize()
 	// Idem mais en OpenGL moderne
 	// defini une liste de sommets, 2D, de type float
 	const Vertex triangles[] = {
-		{-0.5f, -0.5f, 1.0, 0.0, 0.0},
-		{-0.5f, +0.5f, 0.0, 1.0, 0.0},
-		{+0.5f, +0.5f, 0.0, 0.0, 1.0},
+		{-0.5f, -0.5f, -1, 1.0, 0.0, 0.0},
+		{+0.5f, +0.5f, -1, 0.0, 0.0, 1.0},
+		{-0.5f, +0.5f, -1, 0.0, 1.0, 0.0},
+		
 		// second triangle
-		{-0.5f, -0.5f, 1.0, 0.0, 0.0},
-		{+0.5f, +0.5f, 0.0, 0.0, 1.0},
-		{+0.5f, -0.5f, 0.0, 1.0, 0.0}
+		{-0.5f, -0.5f, -1, 1.0, 0.0, 0.0},
+		{+0.5f, -0.5f, -1, 1.0, 1.0, 1.0},
+		{+0.5f, +0.5f, -1, 0.0, 0.0, 1.0}
 	};
 
 	glGenBuffers(1, &VBO);
@@ -91,7 +92,7 @@ void Initialize()
 	int locationColor = glGetAttribLocation(basicProgram, "a_color");
 
 	// Specifie la structure des donnees envoyees au GPU
-	glVertexAttribPointer(location, 2, GL_FLOAT, false, sizeof(Vertex), (void*)offsetof(Vertex, x));
+	glVertexAttribPointer(location, 3, GL_FLOAT, false, sizeof(Vertex), (void*)offsetof(Vertex, x));
 	glVertexAttribPointer(locationColor, 3, GL_FLOAT, false, sizeof(Vertex), (void*)offsetof(Vertex, r));
 	// indique que les donnees sont sous forme de tableau
 	glEnableVertexAttribArray(location);
@@ -136,18 +137,34 @@ void Display(GLFWwindow* window)
 	//matrix
 	mat4 mat = mat4();
 	mat4 matScale = mat4();
+	mat4 matTranslate = mat4();
+	mat4 matProjOrtho = mat4();
+	mat4 matProjPersp = mat4();
 
 	mat.Rotate(glfwGetTime());
 
 	matScale.Identity();
 	matScale.Scale(cos(glfwGetTime()));
 
+	matTranslate.Identity();
+	matTranslate.Translate(cos(glfwGetTime()) * sin(glfwGetTime()), cos(glfwGetTime()) * sin(glfwGetTime()), 0);
+
+	matProjOrtho.Ortho(0, 15,  -1, 1, 1, -1);
+
+	matProjPersp.Persp(0, 15, float(width), float(height));
+
 	//récupérer l'identifiant du Uniform du shader
-	int identifiant_mat = glGetUniformLocation(basicProgram, "u_mat");
+	int identifiant_mat = glGetUniformLocation(basicProgram, "u_matRot");
 	int identifiant_matScale = glGetUniformLocation(basicProgram, "u_matScale");
+	int identifiant_matProj = glGetUniformLocation(basicProgram, "u_matProjOrtho");
+	int identifiant_matTrans = glGetUniformLocation(basicProgram, "u_matTrans");
+	int identifiant_matProjPersp = glGetUniformLocation(basicProgram, "u_matProjPersp");
 
 	glUniformMatrix4fv(identifiant_mat, 1, GL_FALSE, mat.data);
 	glUniformMatrix4fv(identifiant_matScale, 1, GL_FALSE, matScale.data);
+	glUniformMatrix4fv(identifiant_matProj, 1, GL_FALSE, matProjOrtho.data);
+	glUniformMatrix4fv(identifiant_matTrans, 1, GL_FALSE, matTranslate.data);
+	glUniformMatrix4fv(identifiant_matProjPersp, 1, GL_FALSE, matProjPersp.data);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
@@ -170,6 +187,8 @@ int main(void)
 
 	/* Make the window's context current */
 	glfwMakeContextCurrent(window);
+
+	//glEnable(GL_CULL_FACE);
 
 	// toutes nos initialisations vont ici
 	Initialize();
